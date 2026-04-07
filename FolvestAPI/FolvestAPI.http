@@ -1,0 +1,6 @@
+@FolvestAPI_HostAddress = http://localhost:5109
+
+GET {{FolvestAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
