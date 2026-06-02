@@ -42,7 +42,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("Admin123!"));
+Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("User123!"));
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
