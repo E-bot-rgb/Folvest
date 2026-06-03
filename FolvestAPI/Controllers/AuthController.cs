@@ -37,6 +37,14 @@ namespace FolvestAPI.Controllers
             };
 
             _context.Users.Add(user);
+            await _context.SaveChangesAsync(); // ← user gets id here
+
+            var portfolio = new Portfolio
+            {
+                UserId = user.Id,
+                Balance = 100000
+            };
+            _context.Portfolios.Add(portfolio);
             await _context.SaveChangesAsync();
 
             return Ok("User registered successfully.");
