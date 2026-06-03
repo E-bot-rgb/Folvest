@@ -4,6 +4,7 @@ using FolvestAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FolvestAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260602043414_SeedData")]
+    partial class SeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,14 +165,14 @@ namespace FolvestAPI.Migrations
                         {
                             Id = 1,
                             Email = "admin@folvest.com",
-                            PasswordHash = "$2a$11$bXcQH.5OqF9JCNn3dzlAVeecjp7NAlewzHpqaIEsqMmyYB7bMc.ra",
+                            PasswordHash = "$2a$11$zReuUW9PM.Mp05ZTrTMKMO5dXcEGgoBpk1/f6py0j2n4QSs14QH1a",
                             Role = "Admin"
                         },
                         new
                         {
                             Id = 2,
                             Email = "user@folvest.com",
-                            PasswordHash = "$2a$11$XDIgR.aY70TJD0TAAD8dnuQ7GqSZ6oW53F/VWQ37.XOlpNYmi7Ch6",
+                            PasswordHash = "$2a$11$/JATdjm8TDzw72XNnrXnEulAlhnpsXyjYWojs0LPg0Pm59lJpCD2u",
                             Role = "User"
                         });
                 });
