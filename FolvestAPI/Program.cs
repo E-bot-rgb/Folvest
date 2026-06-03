@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FolvestAPI.Data;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,18 +37,16 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
-// Controllers & Swagger
+// Controllers & OpenAPI
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
-Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("Admin123!"));
-Console.WriteLine(BCrypt.Net.BCrypt.HashPassword("User123!"));
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
