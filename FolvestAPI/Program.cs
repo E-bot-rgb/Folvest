@@ -39,6 +39,7 @@ builder.Services.AddCors(options =>
 
 // Controllers & OpenAPI
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
