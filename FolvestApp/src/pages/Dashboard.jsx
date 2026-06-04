@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { getPortfolio, buyStock, sellStock } from '../api/portfolio'
+import { getStock } from '../api/stocks'
 import { getRole, logout } from '../api/auth'
 import './Dashboard.css'
 
@@ -24,15 +25,18 @@ function fmt(n) {
 }
 
 export default function Dashboard() {
-  const [portfolio, setPortfolio]       = useState(null)
-  const [loading, setLoading]           = useState(true)
-  const [error, setError]               = useState(null)
-  const [symbol, setSymbol]             = useState('')
-  const [price, setPrice]               = useState('')
-  const [quantity, setQuantity]         = useState('')
-  const [tradeError, setTradeError]     = useState(null)
-  const [tradeMsg, setTradeMsg]         = useState(null)
-  const [tradeLoading, setTradeLoading] = useState(false)
+  const [portfolio, setPortfolio]         = useState(null)
+  const [loading, setLoading]             = useState(true)
+  const [error, setError]                 = useState(null)
+  const [symbol, setSymbol]               = useState('')
+  const [price, setPrice]                 = useState('')
+  const [quantity, setQuantity]           = useState('')
+  const [tradeError, setTradeError]       = useState(null)
+  const [tradeMsg, setTradeMsg]           = useState(null)
+  const [tradeLoading, setTradeLoading]   = useState(false)
+  const [stockData, setStockData]         = useState(null)
+  const [stockLoading, setStockLoading]   = useState(false)
+  const [stockError, setStockError]       = useState(null)
   const navigate = useNavigate()
   const isAdmin = getRole() === 'Admin'
 
@@ -49,6 +53,22 @@ export default function Dashboard() {
 
   useEffect(() => { fetchPortfolio() }, [fetchPortfolio])
 
+  const handleSearchStock = async () => {
+    if (!symbol) return
+    setStockLoading(true)
+    setStockData(null)
+    setStockError(null)
+    try {
+      const res = await getStock(symbol.toUpperCase())
+      setStockData(res.data)
+      setPrice(res.data.price)
+    } catch {
+      setStockError('Aktie hittades inte.')
+    } finally {
+      setStockLoading(false)
+    }
+  }
+
   const handleTrade = async (type) => {
     setTradeError(null); setTradeMsg(null)
     if (!symbol || !price || !quantity) { setTradeError('Fyll i alla fält.'); return }
@@ -57,7 +77,7 @@ export default function Dashboard() {
       const fn = type === 'buy' ? buyStock : sellStock
       const res = await fn(symbol.toUpperCase(), parseInt(quantity), parseFloat(price))
       setTradeMsg(res.data.message)
-      setSymbol(''); setPrice(''); setQuantity('')
+      setSymbol(''); setPrice(''); setQuantity(''); setStockData(null)
       fetchPortfolio()
     } catch (err) {
       setTradeError(err.response?.data || 'Något gick fel.')
@@ -111,11 +131,34 @@ export default function Dashboard() {
         <section className="section">
           <h2 className="section-title">Köp & Sälj</h2>
           <div className="trade-card">
+
+            {/* Aktiesökning */}
+            <div className="stock-search">
+              <div className="search-row">
+                <input
+                  className="trade-input"
+                  value={symbol}
+                  onChange={e => { setSymbol(e.target.value); setStockData(null) }}
+                  onKeyDown={e => e.key === 'Enter' && handleSearchStock()}
+                  placeholder="Sök symbol, t.ex. AAPL"
+                />
+                <button className="search-btn" onClick={handleSearchStock} disabled={stockLoading}>
+                  {stockLoading ? '...' : 'Hämta pris'}
+                </button>
+              </div>
+              {stockError && <p className="trade-error">{stockError}</p>}
+              {stockData && (
+                <div className="stock-result">
+                  <span className="stock-symbol">{stockData.symbol}</span>
+                  <span className="stock-price">${stockData.price}</span>
+                  <span className={`stock-change ${parseFloat(stockData.change) >= 0 ? 'pos' : 'neg'}`}>
+                    {parseFloat(stockData.change) >= 0 ? '+' : ''}{stockData.changePercent}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="trade-fields">
-              <label className="trade-label">Symbol
-                <input className="trade-input" value={symbol}
-                  onChange={e => setSymbol(e.target.value)} placeholder="t.ex. AAPL" />
-              </label>
               <label className="trade-label">Pris per aktie (SEK)
                 <input className="trade-input" type="number" min="0" step="0.01"
                   value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" />
@@ -125,14 +168,15 @@ export default function Dashboard() {
                   value={quantity} onChange={e => setQuantity(e.target.value)} placeholder="1" />
               </label>
             </div>
+
             {price && quantity && (
               <div className="trade-total">Total: <strong>{fmt(parseFloat(price||0) * parseInt(quantity||0))} SEK</strong></div>
             )}
             {tradeError && <p className="trade-error">{tradeError}</p>}
             {tradeMsg   && <p className="trade-success">{tradeMsg}</p>}
             <div className="trade-btns">
-              <button className="trade-btn buy"  onClick={() => handleTrade('buy')}  disabled={tradeLoading}>{tradeLoading ? '...' : 'Köp'}</button>
-              <button className="trade-btn sell" onClick={() => handleTrade('sell')} disabled={tradeLoading}>{tradeLoading ? '...' : 'Sälj'}</button>
+              <button className="trade-btn buy"  onClick={() => handleTrade('buy')}  disabled={tradeLoading || !symbol}>{tradeLoading ? '...' : 'Köp'}</button>
+              <button className="trade-btn sell" onClick={() => handleTrade('sell')} disabled={tradeLoading || !symbol}>{tradeLoading ? '...' : 'Sälj'}</button>
             </div>
           </div>
         </section>

@@ -161,6 +161,72 @@
 .holding-qty { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
 .holding-price, .holding-value { font-size: 13px; color: var(--text2); font-family: var(--mono); }
 
+/* Stock search */
+.stock-search {
+  margin-bottom: 20px;
+}
+
+.search-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.search-row .trade-input {
+  flex: 1;
+  text-transform: uppercase;
+}
+
+.search-btn {
+  padding: 10px 18px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: opacity .15s;
+  white-space: nowrap;
+}
+.search-btn:hover:not(:disabled) { opacity: .85; }
+.search-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.stock-result {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.stock-symbol {
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.stock-price {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stock-change {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.stock-change.pos { background: var(--green-bg); color: var(--green); }
+.stock-change.neg { background: var(--red-bg); color: var(--red); }
+
 /* Trade */
 .trade-card {
   background: var(--surface);
@@ -171,13 +237,14 @@
 
 .trade-fields {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
   margin-bottom: 16px;
 }
 
 @media (max-width: 600px) {
   .trade-fields { grid-template-columns: 1fr; }
+  .search-row { flex-direction: column; }
 }
 
 .trade-label {
@@ -197,6 +264,8 @@
   font-family: var(--mono);
   outline: none;
   transition: border-color .15s;
+  width: 100%;
+  box-sizing: border-box;
 }
 .trade-input:focus { border-color: var(--accent); }
 .trade-input::placeholder { color: var(--text3); }
