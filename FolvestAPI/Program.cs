@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 using FolvestAPI.Data;
 using Scalar.AspNetCore;
 
@@ -34,13 +35,19 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReact", policy =>
         policy.WithOrigins(
             "http://localhost:5173",
-            "https://localhost:5173")
+            "https://localhost:5173",
+            "http://localhost:5174",
+            "https://localhost:5174")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
 
 // Controllers & OpenAPI
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddHttpClient();
 builder.Services.AddOpenApi();
 

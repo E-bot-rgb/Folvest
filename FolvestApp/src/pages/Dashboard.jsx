@@ -1,8 +1,18 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { getPortfolio, buyStock, sellStock } from '../api/portfolio'
+import { getStock } from '../api/stocks'
 import { getRole, logout } from '../api/auth'
 import './Dashboard.css'
+
+const POPULAR_STOCKS = [
+  { symbol: 'AAPL', name: 'Apple' },
+  { symbol: 'MSFT', name: 'Microsoft' },
+  { symbol: 'GOOGL', name: 'Alphabet' },
+  { symbol: 'TSLA', name: 'Tesla' },
+  { symbol: 'AMZN', name: 'Amazon' },
+  { symbol: 'NVDA', name: 'Nvidia' },
+]
 
 function computeHoldings(transactions = []) {
   const map = {}
@@ -24,15 +34,19 @@ function fmt(n) {
 }
 
 export default function Dashboard() {
-  const [portfolio, setPortfolio]       = useState(null)
-  const [loading, setLoading]           = useState(true)
-  const [error, setError]               = useState(null)
-  const [symbol, setSymbol]             = useState('')
-  const [price, setPrice]               = useState('')
-  const [quantity, setQuantity]         = useState('')
-  const [tradeError, setTradeError]     = useState(null)
-  const [tradeMsg, setTradeMsg]         = useState(null)
-  const [tradeLoading, setTradeLoading] = useState(false)
+  const [portfolio, setPortfolio]         = useState(null)
+  const [loading, setLoading]             = useState(true)
+  const [error, setError]                 = useState(null)
+  const [symbol, setSymbol]               = useState('')
+  const [price, setPrice]                 = useState('')
+  const [quantity, setQuantity]           = useState('')
+  const [tradeError, setTradeError]       = useState(null)
+  const [tradeMsg, setTradeMsg]           = useState(null)
+  const [tradeLoading, setTradeLoading]   = useState(false)
+  const [stockData, setStockData]         = useState(null)
+  const [stockLoading, setStockLoading]   = useState(false)
+  const [stockError, setStockError]       = useState(null)
+  const [marketClosed, setMarketClosed]   = useState(false)
   const navigate = useNavigate()
   const isAdmin = getRole() === 'Admin'
 
@@ -49,6 +63,31 @@ export default function Dashboard() {
 
   useEffect(() => { fetchPortfolio() }, [fetchPortfolio])
 
+  const handleSearchStock = async (sym) => {
+    const searchSym = sym || symbol
+    if (!searchSym) return
+    setSymbol(searchSym)
+    setStockLoading(true)
+    setStockData(null)
+    setStockError(null)
+    setMarketClosed(false)
+    try {
+      const res = await getStock(searchSym.toUpperCase())
+      const data = res.data
+      if (!data.symbol || data.price === '0.0000') {
+        setMarketClosed(true)
+        setStockData({ symbol: searchSym.toUpperCase(), price: null })
+      } else {
+        setStockData(data)
+        setPrice(data.price)
+      }
+    } catch {
+      setStockError('Aktie hittades inte.')
+    } finally {
+      setStockLoading(false)
+    }
+  }
+
   const handleTrade = async (type) => {
     setTradeError(null); setTradeMsg(null)
     if (!symbol || !price || !quantity) { setTradeError('Fyll i alla fält.'); return }
@@ -57,7 +96,7 @@ export default function Dashboard() {
       const fn = type === 'buy' ? buyStock : sellStock
       const res = await fn(symbol.toUpperCase(), parseInt(quantity), parseFloat(price))
       setTradeMsg(res.data.message)
-      setSymbol(''); setPrice(''); setQuantity('')
+      setSymbol(''); setPrice(''); setQuantity(''); setStockData(null)
       fetchPortfolio()
     } catch (err) {
       setTradeError(err.response?.data || 'Något gick fel.')
@@ -85,12 +124,28 @@ export default function Dashboard() {
       </nav>
 
       <div className="dash-content">
+        {/* Balance */}
         <div className="balance-card">
           <div className="balance-label">Tillgängligt saldo</div>
           <div className="balance-amount">{fmt(balance)} <span>SEK</span></div>
           <div className="balance-sub">{holdings.length} aktiepositioner</div>
         </div>
 
+        {/* Popular stocks browser */}
+        <section className="section">
+          <h2 className="section-title">Populära aktier</h2>
+          <div className="browser-grid">
+            {POPULAR_STOCKS.map(s => (
+              <button key={s.symbol} className="browser-card" onClick={() => handleSearchStock(s.symbol)}>
+                <div className="browser-ticker">{s.symbol}</div>
+                <div className="browser-name">{s.name}</div>
+                <div className="browser-action">Välj →</div>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Holdings */}
         <section className="section">
           <h2 className="section-title">Ditt innehav</h2>
           {holdings.length === 0
@@ -108,14 +163,41 @@ export default function Dashboard() {
           }
         </section>
 
+        {/* Trade */}
         <section className="section">
           <h2 className="section-title">Köp & Sälj</h2>
           <div className="trade-card">
+            <div className="stock-search">
+              <div className="search-row">
+                <input
+                  className="trade-input"
+                  value={symbol}
+                  onChange={e => { setSymbol(e.target.value); setStockData(null); setMarketClosed(false) }}
+                  onKeyDown={e => e.key === 'Enter' && handleSearchStock()}
+                  placeholder="Sök symbol, t.ex. AAPL"
+                />
+                <button className="search-btn" onClick={() => handleSearchStock()} disabled={stockLoading}>
+                  {stockLoading ? '...' : 'Hämta pris'}
+                </button>
+              </div>
+              {stockError && <p className="trade-error">{stockError}</p>}
+              {marketClosed && (
+                <div className="market-closed">
+                  ⚠️ Marknaden är stängd just nu (helg/kväll). Ange pris manuellt för att handla.
+                </div>
+              )}
+              {stockData && !marketClosed && (
+                <div className="stock-result">
+                  <span className="stock-symbol">{stockData.symbol}</span>
+                  <span className="stock-price">${stockData.price}</span>
+                  <span className={`stock-change ${parseFloat(stockData.change) >= 0 ? 'pos' : 'neg'}`}>
+                    {parseFloat(stockData.change) >= 0 ? '+' : ''}{stockData.changePercent}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="trade-fields">
-              <label className="trade-label">Symbol
-                <input className="trade-input" value={symbol}
-                  onChange={e => setSymbol(e.target.value)} placeholder="t.ex. AAPL" />
-              </label>
               <label className="trade-label">Pris per aktie (SEK)
                 <input className="trade-input" type="number" min="0" step="0.01"
                   value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" />
@@ -125,18 +207,20 @@ export default function Dashboard() {
                   value={quantity} onChange={e => setQuantity(e.target.value)} placeholder="1" />
               </label>
             </div>
+
             {price && quantity && (
               <div className="trade-total">Total: <strong>{fmt(parseFloat(price||0) * parseInt(quantity||0))} SEK</strong></div>
             )}
             {tradeError && <p className="trade-error">{tradeError}</p>}
             {tradeMsg   && <p className="trade-success">{tradeMsg}</p>}
             <div className="trade-btns">
-              <button className="trade-btn buy"  onClick={() => handleTrade('buy')}  disabled={tradeLoading}>{tradeLoading ? '...' : 'Köp'}</button>
-              <button className="trade-btn sell" onClick={() => handleTrade('sell')} disabled={tradeLoading}>{tradeLoading ? '...' : 'Sälj'}</button>
+              <button className="trade-btn buy"  onClick={() => handleTrade('buy')}  disabled={tradeLoading || !symbol}>{tradeLoading ? '...' : 'Köp'}</button>
+              <button className="trade-btn sell" onClick={() => handleTrade('sell')} disabled={tradeLoading || !symbol}>{tradeLoading ? '...' : 'Sälj'}</button>
             </div>
           </div>
         </section>
 
+        {/* Transactions */}
         <section className="section">
           <h2 className="section-title">Transaktionshistorik</h2>
           {!portfolio?.transactions?.length
