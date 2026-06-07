@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace FolvestAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -83,6 +85,26 @@ namespace FolvestAPI.Migrations
                         principalTable: "Portfolios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Stocks",
+                columns: new[] { "Id", "CurrentPrice", "Name", "Symbol" },
+                values: new object[,]
+                {
+                    { 1, 189.50m, "Apple Inc.", "AAPL" },
+                    { 2, 415.20m, "Microsoft Corp.", "MSFT" },
+                    { 3, 175.80m, "Alphabet Inc.", "GOOGL" },
+                    { 4, 245.30m, "Tesla Inc.", "TSLA" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Email", "PasswordHash", "Role" },
+                values: new object[,]
+                {
+                    { 1, "admin@folvest.com", "$2a$11$bXcQH.5OqF9JCNn3dzlAVeecjp7NAlewzHpqaIEsqMmyYB7bMc.ra", "Admin" },
+                    { 2, "user@folvest.com", "$2a$11$XDIgR.aY70TJD0TAAD8dnuQ7GqSZ6oW53F/VWQ37.XOlpNYmi7Ch6", "User" }
                 });
 
             migrationBuilder.CreateIndex(
