@@ -8,7 +8,7 @@ En investeringssimulator där användare kan öva på aktiehandel med ett virtue
 
 ## Skärmdumpar
 
-> Lägg till skärmdumpar här
+> 
 
 ---
 
@@ -149,8 +149,8 @@ Folvest/
 
 | Namn | Ansvar |
 |---|---|
-| [Ditt namn] | Backend — API, databas, JWT, Alpha Vantage |
-| [Din kompis namn] | Frontend — React, UI, routing, design |
+| [Zebastian] | Backend — API, databas, JWT, Alpha Vantage |
+| [Henry] | Frontend — React, UI, routing, design |
 
 ---
 
