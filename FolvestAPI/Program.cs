@@ -70,7 +70,12 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+// Inte UseHttpsRedirection på Railway
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("AllowReact");
 app.UseAuthentication();
 app.UseAuthorization();
