@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FolvestAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260423202006_Init")]
-    partial class Init
+    [Migration("20260607194448_AddPortfolioSeed")]
+    partial class AddPortfolioSeed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -45,6 +45,20 @@ namespace FolvestAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("Portfolios");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Balance = 100000m,
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Balance = 100000m,
+                            UserId = 2
+                        });
                 });
 
             modelBuilder.Entity("FolvestAPI.Models.Stock", b =>
@@ -69,6 +83,36 @@ namespace FolvestAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Stocks");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CurrentPrice = 189.50m,
+                            Name = "Apple Inc.",
+                            Symbol = "AAPL"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CurrentPrice = 415.20m,
+                            Name = "Microsoft Corp.",
+                            Symbol = "MSFT"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CurrentPrice = 175.80m,
+                            Name = "Alphabet Inc.",
+                            Symbol = "GOOGL"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CurrentPrice = 245.30m,
+                            Name = "Tesla Inc.",
+                            Symbol = "TSLA"
+                        });
                 });
 
             modelBuilder.Entity("FolvestAPI.Models.Transaction", b =>
@@ -129,6 +173,22 @@ namespace FolvestAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@folvest.com",
+                            PasswordHash = "$2a$11$bXcQH.5OqF9JCNn3dzlAVeecjp7NAlewzHpqaIEsqMmyYB7bMc.ra",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "user@folvest.com",
+                            PasswordHash = "$2a$11$XDIgR.aY70TJD0TAAD8dnuQ7GqSZ6oW53F/VWQ37.XOlpNYmi7Ch6",
+                            Role = "User"
+                        });
                 });
 
             modelBuilder.Entity("FolvestAPI.Models.Portfolio", b =>

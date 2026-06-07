@@ -4,6 +4,7 @@ using FolvestAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FolvestAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260607185851_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,20 +45,6 @@ namespace FolvestAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("Portfolios");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Balance = 100000m,
-                            UserId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Balance = 100000m,
-                            UserId = 2
-                        });
                 });
 
             modelBuilder.Entity("FolvestAPI.Models.Stock", b =>
