@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FolvestAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260607184414_PostgresInit")]
-    partial class PostgresInit
+    [Migration("20260607185851_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
