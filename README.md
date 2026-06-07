@@ -4,11 +4,11 @@ En investeringssimulator där användare kan öva på aktiehandel med ett virtue
 
 ## Live Demo
 
-> Kommer läggas till efter deployment
+> https://folvest-roan.vercel.app/login
 
 ## Skärmdumpar
 <img width="1279" height="795" alt="Skärmbild 2026-06-07 180710" src="https://github.com/user-attachments/assets/09b6b3b5-93e2-4159-8b08-5fdfd2e57348" />
-
+OBS: "Aktie hittades inte" visas utanför amerikanska börsen öppettider (måndag–fredag 15:30–22:00 svensk tid). Under öppettider hämtas live-priser via Alpha Vantage API.
 > 
 
 ---
