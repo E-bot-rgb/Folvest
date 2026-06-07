@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using FolvestAPI.Models;
 
 namespace FolvestAPI.Data
@@ -31,6 +31,11 @@ namespace FolvestAPI.Data
                     PasswordHash = "$2a$11$XDIgR.aY70TJD0TAAD8dnuQ7GqSZ6oW53F/VWQ37.XOlpNYmi7Ch6",
                     Role = "User"
                 }
+            );
+
+            modelBuilder.Entity<Portfolio>().HasData(
+                new Portfolio { Id = 1, UserId = 1, Balance = 100000m },
+                new Portfolio { Id = 2, UserId = 2, Balance = 100000m }
             );
 
             modelBuilder.Entity<Stock>().HasData(
