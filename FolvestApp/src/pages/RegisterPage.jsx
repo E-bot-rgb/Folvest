@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { register } from '../api/auth'
+import { register, login } from '../api/auth'
 import './Auth.css'
 
 function RegisterPage() {
@@ -18,7 +18,9 @@ function RegisterPage() {
     setLoading(true)
     try {
       await register(email, password)
-      navigate('/login')
+      const res = await login(email, password)
+      localStorage.setItem('token', res.data.token)
+      navigate('/dashboard')
     } catch {
       setError('Något gick fel. Försök igen.')
     } finally {
