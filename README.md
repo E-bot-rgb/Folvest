@@ -7,6 +7,7 @@ En investeringssimulator där användare kan öva på aktiehandel med ett virtue
 > Kommer läggas till efter deployment
 
 ## Skärmdumpar
+<img width="1279" height="795" alt="Skärmbild 2026-06-07 180710" src="https://github.com/user-attachments/assets/09b6b3b5-93e2-4159-8b08-5fdfd2e57348" />
 
 > 
 
